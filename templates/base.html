@@ -1,0 +1,94 @@
+<!doctype html>
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+
+  <title>{% block page_title %}Quotidian{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{% endblock %}">
+  <meta name="author" content="{% block meta_author %}{% endblock %}">
+
+  <!-- Mobile viewport optimized: h5bp.com/viewport -->
+  <meta name="viewport" content="width=device-width">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='libs/bootstrap/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='libs/bootstrap/css/bootstrap-responsive.min.css') }}">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block css %}{% endblock %}
+  <script src="{{ url_for('static', filename='libs/jquery/jquery-1.9.0.min.js') }}"></script>
+  <script type="text/javascript">
+  function submitenter(myfield, e) {
+      var keycode;
+      if (window.event) {
+          keycode = window.event.keyCode;
+      } else if (e) {
+          keycode = e.which;
+      } else {
+          return true;
+      };
+      if (keycode == 13) {        // enter
+          myfield.submit();
+          return false;
+      } else {
+          return true
+      };
+  }
+  </script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+</div><!-- /.container -->
+{% block body %}
+
+{% block header %}{% endblock %}
+<div class="{% block content_class %}container{% endblock content_class %}">
+
+  <div role="main">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="row">
+      <div class="span12">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          <a class="close" title="Close" href="#" data-dismiss="alert">&times;</a>
+         {{message}}
+        </div>
+        {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+        {% block content %}{% endblock %}
+      </div>
+    </div><!-- end container -->
+
+
+
+   {#  JavaScript at the bottom for fast page loading  #}
+    <script src="{{ url_for('static', filename='libs/bootstrap/js/bootstrap.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/plugins.js') }}"></script>
+    
+   <!--
+   {# Google analytics #}
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-39544608-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+    -->
+    {% block scripts %}{% endblock scripts %}
+    {% endblock %}
+  </body>
+  </html>

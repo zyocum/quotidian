@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+    <head>
+        <style type="text/css">
+        table {
+            font-family: verdana,arial,sans-serif;
+            font-size: 11px;
+            color: #333333;
+            border-width: 1px;
+            border-color: #a9c6c9;
+            border-collapse: collapse;
+        }
+        td {
+            border-width: 1px;
+            width: 50px;
+            height: 20px;
+            padding: 3px;
+            border-style: solid;
+            border-color: #a9c6c9;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <script type="text/javascript">
+        // Formatting hours
+        function zeroFill(number) {
+            var w = number.toString().length;
+            if (w == 1)
+                return "0" + number + ":00";
+            else
+                return number + ":00";
+        }
+        function tableCreate() {
+            var body = document.body,
+                tbl = document.createElement('table');
+            var dt = new Date();
+            // Try to work with SQLite
+            /*
+                var db = openDatabase('mydb', '1.0', 'my first database', 2 * 1024);
+            
+                db.transaction(
+                    function (tx) {
+                        tx.executeSql('CREATE TABLE IF NOT EXISTS event (id UNIQUE, begin TEXT, end TEXT)');
+                        tx.executeSql('INSERT INTO event (id, begin, end) VALUES (1, "18:31", "21:00")');
+                    
+                    }
+                );    
+            
+                document.write("Select");
+                db.transaction(
+                    function(tx) {      
+                        tx.executeSql('SELECT * FROM event', [], 
+                            function (tx, results) {
+                                var len = results.rows.length;
+                                for (var i = 0; i < len; ++i) {
+                                    var obj = results.rows.item(i);
+                                    alert(obj);
+                                }
+                            }
+                        );
+                    }
+                );    
+            */
+            // Get Begin and End Time
+            var BegTime = '10:05:00';
+            var EndTime = '12:05:00';
+            BegTime = BegTime.split(":");
+            EndTime = EndTime.split(":");
+            // Get Hour            
+            var From = parseInt(BegTime[0]);
+            var To = parseInt(EndTime[0]);
+            if (From > To) {
+                var Tmp = From;
+                From = To;
+                To = Tmp;
+            }
+            // Draw Table
+            for (var i = 0; i < 25; i++) {
+                var tr = tbl.insertRow();
+                for (var j = 0; j < 2; j++) {
+                    var td = tr.insertCell();
+                    // HeadCell Color
+                    if (i == 0 || j == 0)
+                        td.style.backgroundColor = '#c3dde0'
+                        // Current Date in TableHead
+                    if (i == 0 && j == 1)
+                        td.appendChild(document.createTextNode((dt.getMonth() + 1) + "/" + dt.getDate() + "/" + dt.getFullYear()));
+                    // Hours
+                    if (i != 0 && j == 0)
+                        td.appendChild(document.createTextNode(zeroFill(i - 1)));
+                    // Filling   
+                    if (i > From && i - 1 <= To && j == 1)
+                        td.style.backgroundColor = '#33cc66'
+                }
+            }
+            /*    
+            // Safari Draw Table (not correct work)
+            for(var i = 24; i >= 0; i--){
+                var tr = tbl.insertRow();
+                for(var j = 0; j < 2; j++){
+
+                        var td = tr.insertCell();
+            
+                        // HeadCell Color
+                        if( i == 0 || j == 1)
+                            td.style.backgroundColor = '#c3dde0'
+                        // Current Date in TableHead
+                        if( i == 0 && j == 0)
+                            td.appendChild(document.createTextNode((dt.getMonth() + 1) + "/" + dt.getDate() + "/" + dt.getFullYear()));
+                        // Hours
+                        if( i != 0 && j == 1)                       
+                           td.appendChild(document.createTextNode(zeroFill(i-1)));
+                        // Filling   
+                        if(i > From && i-1 <= To && j == 0 )
+                           td.style.backgroundColor = '#33cc66'
+                }
+            }
+            */
+            body.appendChild(tbl);
+        }
+        // calling table create and draw function
+        tableCreate();
+        </script>
+    </body>
+</html>

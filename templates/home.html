@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="center">
+<h1 class="page-title">Enter Hours</h1>
+<p>Push record to talk.</p>
+
+      <form id="user_input">
+          <div align="center">
+              <input
+                  id="record_button"
+                  type="button"
+                  class="btn btn-danger"
+                  value="Record"
+              >
+                  <span id="time"></span>
+              </input>
+              <input
+                  id="user_text"
+                  type="text"
+                  size="25"
+                  value="I worked …"
+                  onKeyPress="submitenter(this,event); return false;"
+              >
+              <input
+                  id="submit_button"
+                  onClick="fillHours(); return false;"
+                  class="btn btn-danger"
+                  type="submit"
+                  value="Submit"
+              >
+              <input
+                  id="interval"
+                  type="hidden"
+                  value="T8:0:0Z/T17:0:0Z"
+              >
+              <p></p>
+              <input
+                  id="previous_day"
+                  onClick="previousDay(); unfillHours(); return false;"
+                  class="btn"
+                  type="button"
+                  value="<"
+                  onKeyPress="keypress(this,event); return false;"
+              >
+              <input
+                  id="clear"
+                  onClick="unfillHours(); return false;"
+                  class="btn"
+                  type="button"
+                  value="Clear Hours"
+              >
+              <input
+                  id="next_day"
+                  onClick="nextDay(); unfillHours(); return false;"
+                  class="btn"
+                  type="button"
+                  value=">"
+                  onKeyPress="keypress(this,event); return false;"
+              >
+          </div>
+      </form>
+</div>
+
+<center>
+    <div id="calendar"></div>
+</center>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/record.js') }}"></script>
+<script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+{% endblock scripts %}

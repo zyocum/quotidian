@@ -1,0 +1,128 @@
+/* =============================================================================
+   App specific CSS file.
+   ========================================================================== */
+
+/* universal */
+
+html {
+  overflow-y: scroll;
+}
+
+body {
+  padding: 0px 60px 0px 60px;
+}
+
+section {
+  overflow: auto;
+}
+
+input[type="text"] {
+    margin-bottom: 0px !important;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.center {
+  text-align: center;
+}
+
+.center h1 {
+    margin-bottom: 10px;
+}
+
+h1.page-title {
+  font-size: 50px;
+}
+
+p.tagline{
+  color: #ffffff;
+  font-style: italic;
+}
+
+/* footer */
+
+footer {
+  margin-top: 45px;
+  padding-top: 5px;
+  border-top: 1px solid #eaeaea;
+  color: #999999;
+}
+
+footer a {
+  color: #999999;
+}  
+
+footer p {
+  float: right;
+  margin-right: 25px;
+}
+
+footer ul {
+  list-style: none;
+}
+
+footer ul li {
+  float: left;
+  margin-left: 10px;
+}
+
+footer .company {
+  float: left;
+  margin-left: 25px;
+}
+
+footer .footer-nav {
+  float: right;
+  margin-right: 25px;
+}
+
+/* table */
+
+table {
+    /* font-family: verdana,arial,sans-serif; */
+    margin: 0 auto 0 auto;
+    font-size: 14px;
+    color: White;
+    border-width: 1px;
+    border-color: #cccccc;
+    border-collapse: collapse;
+}
+
+td {
+    border-width: 1px;
+    text-align: right;
+    width: 75px;
+    padding: 3px;
+    border-style: solid;
+    border-color: #cccccc;
+}
+
+td.currentHourLabel {
+    font-weight: bold;
+    border: 2px solid Red;
+    border-right: 1px solid Red;
+    background-color: Red;
+}
+
+td.currentHourCell {
+    border: 2px solid Red;
+}
+
+td.header {
+    background-color: none;
+    border: none;
+}
+
+td.columnLabel {
+    text-align: center;
+}
+
+td.worked {
+    background-color: #cccccc;
+}
+
+td.notworked {
+    background-color: none;
+}
