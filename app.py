@@ -64,8 +64,8 @@ def serve_audio(filename):
 							   
 test_database = {}
 							   
-@app.route('/database', methods = ['POST'])
-def database_request():
+@app.route('/push_time', methods = ['POST'])
+def push_time():
     transcription = request.form['transcription']
     date = request.form['date'].split(',')[0]
     transcription, interval = process_text(transcription)
@@ -73,7 +73,17 @@ def database_request():
     test_database[date] = interval
 
     app.logger.info(test_database)
-    return jsonify(transcription=interval)
+    return jsonify(interval=interval)
+	
+@app.route('/pull_time', methods = ['POST'])
+def pull_time():
+    date = request.form['date'].split(',')[0]
+
+    interval = test_database[date]
+
+    app.logger.info(test_database)
+    return jsonify(interval=interval)
+
 	
 	
 	

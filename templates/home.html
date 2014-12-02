@@ -66,7 +66,8 @@
 </center>
 
 <script>
-    function loadXMLDoc()
+	// CALL THIS WHEN YOU SUBMIT TIME
+    function pushTime()
     {
         var req = new XMLHttpRequest()
         req.onreadystatechange = function()
@@ -81,27 +82,57 @@
                 {
 					//get request - data returned by app.py
                     var response = JSON.parse(req.responseText)
-                    document.getElementById('myDiv').innerHTML = response.transcription
+                    document.getElementById('myDiv').innerHTML = response.interval //display get
                 }
             }
         }
 		//post reqest - data sent to app.py
-        req.open('POST', '/database')
+        req.open('POST', '/push_time')
         req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-        var interval = document.getElementById('scname').value
-        var sec = document.getElementById('secret').value
-        var postVars = 'transcription='+interval+'&date='+today.toString()
+        var transcription = document.getElementById('scname').value
+        var postVars = 'transcription='+transcription+'&date='+today.toString()
+        req.send(postVars)
+        return false
+    }
+	
+	// CALL THIS WHEN YOU CHANGE DAY
+    function pullTime()
+    {
+        var req = new XMLHttpRequest()
+        req.onreadystatechange = function()
+        {
+            if (req.readyState == 4)
+            {
+                if (req.status != 200)
+                {
+                    //error handling code here
+                }
+                else
+                {
+					//get request - data returned by app.py
+                    var response = JSON.parse(req.responseText)
+                    document.getElementById('myDiv').innerHTML = response.interval //display get
+                }
+            }
+        }
+		//post reqest - data sent to app.py
+        req.open('POST', '/pull_time')
+        req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+        var postVars = 'date='+today.toString()
         req.send(postVars)
         return false
     }
 </script>
+
 
 </head>
 <body>
 <form action="" method="POST">
 <input type="text" name="scname" id="scname">
 <input type="hidden" name="secret" id="secret" value="shhh">
-<input type="button" value="Submit" onclick="return loadXMLDoc()">
+<input type="button" value="push" onclick="return pushTime()">
+<p>
+<input type="button" value="pull" onclick="return pullTime()">
 </form>
 <div id="myDiv"></div>
 </body>
