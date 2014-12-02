@@ -91,7 +91,7 @@ def clear_time():
     test_database[date] = ''
 
     app.logger.info(test_database)
-    return jsonify(interval=interval)
+    return jsonify(interval='')
 	
 @app.route('/test', methods = ['POST'])
 def test():

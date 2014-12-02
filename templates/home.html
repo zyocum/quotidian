@@ -90,7 +90,6 @@
                     var response = JSON.parse(req.responseText)
                     //document.getElementById('myDiv').innerHTML = response.interval //display get
 					// HOOK INTO CALENDAR GUI HERE
-					var x = response.interval;
 					var start = parseInt(response.interval.split('/')[0].split('T')[1].split(':')[0])-1,
 					end = parseInt(response.interval.split('/')[1].split('T')[1].split(':')[0])-1;
 			        setRange(start, end, 'worked', 'notworked');
