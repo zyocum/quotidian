@@ -23,7 +23,7 @@
            
               <input
                   id="submit_button"
-                  onClick="fillHours(); pushTime(); return false;"
+                  onClick="pushTime(); return false;"
                   class="btn btn-danger"
                   type="submit"
                   value="Submit"
@@ -38,7 +38,7 @@
 			  <p></p>
 			  <input
                   id="previous_day"
-                  onClick="previousDay(); pullTime(); unfillHours(); return false;"
+                  onClick="previousDay(); unfillHours();  pullTime(); return false;"
                   class="btn"
                   type="button"
                   value="<"
@@ -53,7 +53,7 @@
               >
               <input
                   id="next_day"
-                  onClick="nextDay(); pullTime(); unfillHours(); return false;"
+                  onClick="nextDay(); unfillHours(); pullTime(); return false;"
                   class="btn"
                   type="button"
                   value=">"
@@ -84,8 +84,11 @@
                 {
 					//get request - data returned by app.py
                     var response = JSON.parse(req.responseText)
-                    document.getElementById('myDiv').innerHTML = response.interval //display get
+                    //document.getElementById('myDiv').innerHTML = response.interval //display get
 					// HOOK INTO CALENDAR GUI HERE
+					start = parseInt(response.interval.split('/')[0].split('T')[1].split(':')[0])-1,
+					end = parseInt(response.interval.split('/')[1].split('T')[1].split(':')[0])-1;
+			        setRange(start, end, 'worked', 'notworked');
                 }
             }
         }
@@ -114,8 +117,11 @@
                 {
 					//get request - data returned by app.py
                     var response = JSON.parse(req.responseText)
-                    document.getElementById('myDiv').innerHTML = response.interval //display get
+                    //document.getElementById('myDiv').innerHTML = response.interval //display get
 					// HOOK INTO CALENDAR GUI HERE
+					start = parseInt(response.interval.split('/')[0].split('T')[1].split(':')[0])-1,
+					end = parseInt(response.interval.split('/')[1].split('T')[1].split(':')[0])-1;
+			        setRange(start, end, 'worked', 'notworked');				
                 }
             }
         }
