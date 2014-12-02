@@ -296,11 +296,6 @@ previousDay = function() {
 
 // Set the class of all hours in a given range
 setRange = function(start, end, on, off) {
-    //if (start > end) {
-    //    var temp  = start;
-    //        start = end;
-    //        end   = temp;
-    //}
     hours.slice(start, end).map(function(hour) {
         hour.classList.add(on);
         hour.classList.remove(off);
@@ -363,5 +358,5 @@ getIntervals = function() {
         console.log('Interval ' + i + ' : ' + interval.join('/'));
         intervals.push(interval.join('/'));
     }
-    return intervals;
+    return intervals.join(",");
 }

@@ -84,6 +84,26 @@ def pull_time():
     app.logger.info(test_database)
     return jsonify(interval=interval)
 
+@app.route('/clear_time', methods = ['POST'])
+def clear_time():
+    date = request.form['date'].split(',')[0]
+
+    test_database[date] = ''
+
+    app.logger.info(test_database)
+    return jsonify(interval=interval)
+	
+@app.route('/test', methods = ['POST'])
+def test():
+
+    interval = request.form['transcription']
+    date = request.form['date'].split(',')[0]
+
+    app.logger.info(interval)
+
+    test_database[date] = interval
+
+    return jsonify(interval=interval)
 	
 	
 	
