@@ -71,3 +71,44 @@
 <script src="{{ url_for('static', filename='js/record.js') }}"></script>
 <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
 {% endblock scripts %}
+
+<script>
+    function loadXMLDoc()
+    {
+        var req = new XMLHttpRequest()
+        req.onreadystatechange = function()
+        {
+            if (req.readyState == 4)
+            {
+                if (req.status != 200)
+                {
+                    //error handling code here
+                }
+                else
+                {
+					//get request - data returned by app.py
+                    var response = JSON.parse(req.responseText)
+                    document.getElementById('myDiv').innerHTML = response.transcription
+                }
+            }
+        }
+		//post reqest - data sent to app.py
+        req.open('POST', '/database')
+        req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+        var interval = document.getElementById('scname').value
+        var sec = document.getElementById('secret').value
+        var postVars = 'transcription='+interval+'&date='+today.toString()
+        req.send(postVars)
+        return false
+    }
+</script>
+
+</head>
+<body>
+<form action="" method="POST">
+<input type="text" name="scname" id="scname">
+<input type="hidden" name="secret" id="secret" value="shhh">
+<input type="button" value="Submit" onclick="return loadXMLDoc()">
+</form>
+<div id="myDiv"></div>
+</body>

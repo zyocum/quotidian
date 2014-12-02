@@ -3,7 +3,7 @@ import random
 import tempfile
 from flask import Flask, render_template, send_from_directory, request, jsonify, flash
 from werkzeug import secure_filename
-from extract_time_intervals import process_file
+from extract_time_intervals import process_file, process_text
 import logging
 from logging.handlers import RotatingFileHandler
 import shutil
@@ -13,11 +13,10 @@ SECRET_KEY = 'hin6bab8ge25*r=x&amp;+5$0kn=-#log$pt^#@vrqjld!^2ci@g*b'
 DEBUG = True
 dirname, filename = os.path.split(os.path.abspath(__file__))
 UPLOAD_FOLDER = '{0}/media/audio'.format(os.path.abspath(dirname))
-ALLOWED_EXTENSIONS = set( ['wav', 'mp3'])
+ALLOWED_EXTENSIONS = set(['wav', 'mp3'])
 
 app = Flask(__name__)
 app.config.from_object(__name__)
-
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -62,6 +61,22 @@ def serve_audio(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
+							   
+test_database = {}
+							   
+@app.route('/database', methods = ['POST'])
+def database_request():
+    transcription = request.form['transcription']
+    date = request.form['date'].split(',')[0]
+    transcription, interval = process_text(transcription)
+    
+    test_database[date] = interval
+
+    app.logger.info(test_database)
+    return jsonify(transcription=interval)
+	
+	
+	
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='127.0.0.1', port=port)
