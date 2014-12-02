@@ -101,7 +101,8 @@ class GetTimeWorked():
         if end_hour:
             end_hour = int(end_hour[0])
             # set am / pm for end time based on current time
-            if self.curr_interval.now.hour > 12:
+            if start_hour > end_hour:
+            #if self.curr_interval.now.hour > 12:
                 end_hour = end_hour + 12
             if end_minute:
                 end_minute = int(end_minute[0])
@@ -134,6 +135,14 @@ def process_file(filepath):
     else:
         return t.transcription, t.curr_interval.interval_to_iso()
 
+def process_text(transcription):
+    t = GetTimeWorked()
+    t.transcription = transcription
+    error = t.parse_transcription()
+    if error:
+        return t.transcription, error
+    else:
+        return t.transcription, t.curr_interval.interval_to_iso()
 
 if __name__ == "__main__":
     
