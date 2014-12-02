@@ -65,13 +65,6 @@
     <div id="calendar"></div>
 </center>
 
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/record.js') }}"></script>
-<script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
-{% endblock scripts %}
-
 <script>
     function loadXMLDoc()
     {
@@ -112,3 +105,10 @@
 </form>
 <div id="myDiv"></div>
 </body>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/record.js') }}"></script>
+<script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+{% endblock scripts %}
