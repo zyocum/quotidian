@@ -79,7 +79,7 @@ def push_time():
 def pull_time():
     date = request.form['date'].split(',')[0]
 
-    interval = test_database[date]
+    interval = test_database.get(date, '')
 
     app.logger.info(test_database)
     return jsonify(interval=interval)

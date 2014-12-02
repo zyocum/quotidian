@@ -19,11 +19,11 @@
                   type="text"
                   size="25"
                   value="I worked …"
-                  onKeyPress="submitenter(this,event); return false;"
-              >
+                  <--onKeyPress="submitenter(this,event); return false;"-->
+           
               <input
                   id="submit_button"
-                  onClick="fillHours(); return false;"
+                  onClick="fillHours(); pushTime(); return false;"
                   class="btn btn-danger"
                   type="submit"
                   value="Submit"
@@ -34,9 +34,11 @@
                   value="T8:0:0Z/T17:0:0Z"
               >
               <p></p>
-              <input
+              <div id="myDiv"></div>
+			  <p></p>
+			  <input
                   id="previous_day"
-                  onClick="previousDay(); unfillHours(); return false;"
+                  onClick="previousDay(); pullTime(); unfillHours(); return false;"
                   class="btn"
                   type="button"
                   value="<"
@@ -51,7 +53,7 @@
               >
               <input
                   id="next_day"
-                  onClick="nextDay(); unfillHours(); return false;"
+                  onClick="nextDay(); pullTime(); unfillHours(); return false;"
                   class="btn"
                   type="button"
                   value=">"
@@ -83,13 +85,14 @@
 					//get request - data returned by app.py
                     var response = JSON.parse(req.responseText)
                     document.getElementById('myDiv').innerHTML = response.interval //display get
+					// HOOK INTO CALENDAR GUI HERE
                 }
             }
         }
 		//post reqest - data sent to app.py
         req.open('POST', '/push_time')
         req.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-        var transcription = document.getElementById('scname').value
+        var transcription = document.getElementById('user_text').value
         var postVars = 'transcription='+transcription+'&date='+today.toString()
         req.send(postVars)
         return false
@@ -112,6 +115,7 @@
 					//get request - data returned by app.py
                     var response = JSON.parse(req.responseText)
                     document.getElementById('myDiv').innerHTML = response.interval //display get
+					// HOOK INTO CALENDAR GUI HERE
                 }
             }
         }
@@ -123,19 +127,6 @@
         return false
     }
 </script>
-
-
-</head>
-<body>
-<form action="" method="POST">
-<input type="text" name="scname" id="scname">
-<input type="hidden" name="secret" id="secret" value="shhh">
-<input type="button" value="push" onclick="return pushTime()">
-<p>
-<input type="button" value="pull" onclick="return pullTime()">
-</form>
-<div id="myDiv"></div>
-</body>
 
 {% endblock %}
 
