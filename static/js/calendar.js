@@ -17,9 +17,9 @@ function pad(n, width, z) {
 }
 
 // Format an integer as HH:00
-function getHour(number) {
-    return pad(number, 2) + ":00";
-}
+//function getHourString(number) {
+//    return pad(number, 2) + ":00";
+//}
 
 function getHumanTimeString(dateTime) {
     var dt = dateTime.value.toLocaleTimeString().split(' '),
@@ -29,13 +29,11 @@ function getHumanTimeString(dateTime) {
     return [hm, apm].join(' ');
 }
 
-function toggleClass(element, on, off) {
-    if (element.classList.contains(on)) {
-        element.classList.add(off);
-        element.classList.remove(on);
+function toggleClass(element) {
+    if (! element.classList.contains('worked')) {
+        element.classList.add('worked');
     } else {
-        element.classList.add(on);
-        element.classList.remove(off);
+        element.classList.remove('worked');
     }
 }
 
@@ -230,7 +228,7 @@ table.id = 'table';
         var tr = table.insertRow();
         for(var j = 0; j < 2; j++){
             var td = tr.insertCell();
-            // Header cell style
+            // Set header cell CSS class
             if (i == 0 || j == 0) {
                 td.classList.add('noclick');
                 td.classList.add('header');
@@ -248,10 +246,9 @@ table.id = 'table';
                     document.createTextNode(getHumanTimeString(time))
                 );
             }
-            // Add hour Ids and initialize as not worked
+            // Add hour IDs
             if (i > 0 && j > 0) {
                 td.id = 'Hour-' + (i-1);
-                td.classList.add('notworked');
             }
         }
         // Increment to the Next Hour
@@ -262,7 +259,8 @@ table.id = 'table';
     if(table) table.onclick = function(e) {
         var target = (e || window.event).target;
         if (target.tagName in {TD:1} && isToggleable(target)) {
-            toggleClass(target, 'worked', 'notworked');
+            toggleClass(target);
+            calendarClick();
         }
     };
     
@@ -294,25 +292,44 @@ previousDay = function() {
     setCurrentHourIndicator();
 }
 
-// Set the class of all hours in a given range
-setRange = function(start, end, on, off) {
+setHours = function(start, end) {
     hours.slice(start, end).map(function(hour) {
-        hour.classList.add(on);
-        hour.classList.remove(off);
+        if (! hour.classList.contains('worked')) {
+            hour.classList.add('worked');
+        }
+    });
+}
+
+unsetHours = function(start, end) {
+    hours.slice(start, end).map(function(hour) {
+        if (hour.classList.contains('worked')) {
+            hour.classList.remove('worked');
+        }
     });
 }
 
 // Set hours in the interval (specified in the HTML form hidden value) as worked
 fillHours = function() {
-    var interval = document.querySelector('input[type="hidden"]').value,
-        start = parseInt(interval.split('/')[0].split('T')[1].split(':')[0])-1,
-        end = parseInt(interval.split('/')[1].split('T')[1].split(':')[0])-1;
-    setRange(start, end, 'worked', 'notworked');
+    var intervals = document.querySelector('input[type="hidden"]').value;
+    for (var i = 0; i < intervals.length; i++) {
+        var interval = intervals[i],
+            start = startHour(interval),
+            end = endHour(interval);
+        setHours(start, end);
+    }
+}
+
+startHour = function(interval) {
+    return parseInt(interval.split('/')[0].split('T')[1].split(':')[0])-1);
+}
+
+endHour = function(interval) {
+    return parseInt(interval.split('/')[1].split('T')[1].split(':')[0])-1);
 }
 
 // Set all hours as not worked
-unfillHours = function() {
-    setRange(0, 24, 'notworked', 'worked');
+unfillAllHours = function() {
+    unsetHours(0, 24);
 }
 
 // Return whether the given hour was worked or not
@@ -359,4 +376,127 @@ getIntervals = function() {
         intervals.push(interval.join('/'));
     }
     return intervals.join(",");
+}
+
+// CALL THIS WHEN YOU SUBMIT TIME
+function pushTime()
+{
+    var req = new XMLHttpRequest()
+    req.onreadystatechange = function()
+    {
+        if (req.readyState == 4)
+        {
+            if (req.status != 200)
+            {
+                //error handling code here
+            }
+            else
+            {
+                //get request - data returned by app.py
+                var response = JSON.parse(req.responseText),
+                    intervals = response.intervals.split(',');
+                //document.getElementById('myDiv').innerHTML = response.interval //display get
+                // HOOK INTO CALENDAR GUI HERE
+                for (var i = 0; i < intervals.length; i++) {
+                    var start = startHour(intervals[i]),
+                        end = endHour(intervals[i]);
+                    setHours(start, end);
+                }
+            }
+        }
+    }
+    //post reqest - data sent to app.py
+    req.open('POST', '/push_time');
+    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    var transcription = document.getElementById('user_text').value;
+    var postVars = 'transcription='+transcription+'&date='+today.toString();
+    req.send(postVars);
+    return false;
+}
+
+// CALL THIS WHEN YOU CHANGE DAY
+function pullTime()
+{
+    var req = new XMLHttpRequest()
+    req.onreadystatechange = function()
+    {
+        if (req.readyState == 4)
+        {
+            if (req.status != 200)
+            {
+                //error handling code here
+            }
+            else
+            {
+                //get request - data returned by app.py
+                var response = JSON.parse(req.responseText),
+                    intervals = response.intervals.split(',');
+                //document.getElementById('myDiv').innerHTML = response.interval //display get
+                // HOOK INTO CALENDAR GUI HERE
+                for (var i = 0; i < intervals.length; i++) {
+                    var start = startHour(intervals[i]),
+                        end = endHour(intervals[i]);
+                    setHours(start, end);
+                }
+            }
+        }
+    }
+    //post reqest - data sent to app.py
+    req.open('POST', '/pull_time');
+    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    var postVars = 'date='+today.toString();
+    req.send(postVars);
+    return false;
+}
+
+// CALL THIS WHEN YOU CLEAR DAY
+function clearTime()
+{
+    var req = new XMLHttpRequest()
+    req.onreadystatechange = function()
+    {
+        if (req.readyState == 4)
+        {
+            if (req.status != 200)
+            {
+                //error handling code here
+            }
+            else
+            {
+                //get request - data returned by app.py
+                var response = JSON.parse(req.responseText)
+                //document.getElementById('myDiv').innerHTML = response.interval //display get
+            }
+        }
+    }
+    //post reqest - data sent to app.py
+    req.open('POST', '/clear_time');
+    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    var postVars = 'date='+today.toString();
+    req.send(postVars);
+    return false;
+}
+
+function calendarClick() {
+    var req = new XMLHttpRequest()
+    //req.onreadystatechange = function()
+    //{
+    //    if (req.readyState == 4)
+    //    {
+    //        if (req.status != 200)
+    //        {
+    //            //error handling code here
+    //        }
+    //        else
+    //        {
+    //            //post request
+    //        }
+    //    }
+    //}
+    //post reqest - data sent to app.py
+    req.open('POST', '/calendar_click');
+    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    var postVars = 'intervals='+getIntervals()+'&date='+today.toString();
+    req.send(postVars);
+    return false;
 }

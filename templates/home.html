@@ -35,10 +35,10 @@
               >
               <p></p>
               <div id="myDiv"></div>
-			  <p></p>
-			  <input
+              <p></p>
+              <input
                   id="previous_day"
-                  onClick="previousDay(); unfillHours();  pullTime(); return false;"
+                  onClick="previousDay(); unfillAllHours(); pullTime(); return false;"
                   class="btn"
                   type="button"
                   value="<"
@@ -46,14 +46,14 @@
               >
               <input
                   id="clear"
-                  onClick="clearTime(); unfillHours(); return false;"
+                  onClick="clearTime(); unfillAllHours(); return false;"
                   class="btn"
                   type="button"
                   value="Clear Hours"
               >
               <input
                   id="next_day"
-                  onClick="nextDay(); unfillHours(); pullTime(); return false;"
+                  onClick="nextDay(); unfillAllHours(); pullTime(); return false;"
                   class="btn"
                   type="button"
                   value=">"
@@ -71,99 +71,4 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/record.js') }}"></script>
 <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
-<script>
-	// CALL THIS WHEN YOU SUBMIT TIME
-    function pushTime()
-    {
-        var req = new XMLHttpRequest()
-        req.onreadystatechange = function()
-        {
-            if (req.readyState == 4)
-            {
-                if (req.status != 200)
-                {
-                    //error handling code here
-                }
-                else
-                {
-					//get request - data returned by app.py
-                    var response = JSON.parse(req.responseText)
-                    //document.getElementById('myDiv').innerHTML = response.interval //display get
-					// HOOK INTO CALENDAR GUI HERE
-					var start = parseInt(response.interval.split('/')[0].split('T')[1].split(':')[0])-1,
-					end = parseInt(response.interval.split('/')[1].split('T')[1].split(':')[0])-1;
-			        setRange(start, end, 'worked', 'notworked');
-                }
-            }
-        }
-		//post reqest - data sent to app.py
-        req.open('POST', '/push_time');
-        req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        var transcription = document.getElementById('user_text').value;
-        var postVars = 'transcription='+transcription+'&date='+today.toString();
-        req.send(postVars);
-        return false;
-    }
-	
-	// CALL THIS WHEN YOU CHANGE DAY
-    function pullTime()
-    {
-        var req = new XMLHttpRequest()
-        req.onreadystatechange = function()
-        {
-            if (req.readyState == 4)
-            {
-                if (req.status != 200)
-                {
-                    //error handling code here
-                }
-                else
-                {
-					//get request - data returned by app.py
-                    var response = JSON.parse(req.responseText)
-                    //document.getElementById('myDiv').innerHTML = response.interval //display get
-					// HOOK INTO CALENDAR GUI HERE
-					var start = parseInt(response.interval.split('/')[0].split('T')[1].split(':')[0])-1,
-					end = parseInt(response.interval.split('/')[1].split('T')[1].split(':')[0])-1;
-			        setRange(start, end, 'worked', 'notworked');
-                }
-            }
-        }
-		//post reqest - data sent to app.py
-        req.open('POST', '/pull_time');
-        req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        var postVars = 'date='+today.toString();
-        req.send(postVars);
-        return false;
-    }
-
-	// CALL THIS WHEN YOU CLEAR DAY
-    function clearTime()
-    {
-        var req = new XMLHttpRequest()
-        req.onreadystatechange = function()
-        {
-            if (req.readyState == 4)
-            {
-                if (req.status != 200)
-                {
-                    //error handling code here
-                }
-                else
-                {
-					//get request - data returned by app.py
-                    var response = JSON.parse(req.responseText)
-                    //document.getElementById('myDiv').innerHTML = response.interval //display get
-                }
-            }
-        }
-		//post reqest - data sent to app.py
-        req.open('POST', '/clear_time');
-        req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        var postVars = 'date='+today.toString();
-        req.send(postVars);
-        return false;
-    }
-
-</script>
 {% endblock scripts %}
