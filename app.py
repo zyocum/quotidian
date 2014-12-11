@@ -70,10 +70,14 @@ def push_time():
     date = request.form['date'].split(',')[0]
     transcription, interval = process_text(transcription)
     
-    test_database[date] = test_database.get(date, '') +','+interval
+    temp = test_database.get(date, '')
+    if temp == '':
+	    test_database[date] = interval
+    else:
+	    test_database[date] =  temp + ',' + interval
 	
     intervals = test_database[date]
-    app.logger.info(test_database)
+    app.logger.info(intervals)
     return jsonify(intervals=intervals)
 	
 @app.route('/pull_time', methods = ['POST'])
