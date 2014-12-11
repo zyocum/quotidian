@@ -70,9 +70,9 @@ def push_time():
     date = request.form['date'].split(',')[0]
     transcription, interval = process_text(transcription)
     
-    test_database[date] = test_database.get(date, []).append(interval)
-
-    intervals = ','.join(test_database[date])
+    test_database[date] = test_database.get(date, '') +','+interval
+	
+    intervals = test_database[date]
     app.logger.info(test_database)
     return jsonify(intervals=intervals)
 	
@@ -80,7 +80,7 @@ def push_time():
 def pull_time():
     date = request.form['date'].split(',')[0]
 
-    intervals = ','.join(test_database.get(date, []))
+    intervals = test_database.get(date, '')
 
     app.logger.info(test_database)
     return jsonify(intervals=intervals)
@@ -89,7 +89,7 @@ def pull_time():
 def clear_time():
     date = request.form['date'].split(',')[0]
 
-    test_database[date] = []
+    test_database[date] = ''
 
     app.logger.info(test_database)
     return jsonify(intervals='')
@@ -97,12 +97,12 @@ def clear_time():
 @app.route('/calendar_click', methods = ['POST'])
 def calendar_click():
     date = request.form['date'].split(',')[0]
-    intervals = request.intervals['transcription'].split(',')
+    intervals = request.form['intervals']
 
     test_database[date] = intervals
 
     app.logger.info(test_database)
-    return jsonify(interval='')
+    return jsonify(intervals='')
 
 	
 if __name__ == '__main__':

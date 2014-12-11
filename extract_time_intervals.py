@@ -13,7 +13,6 @@ http://en.wikipedia.org/wiki/ISO_8601
 '''
 import speech_recognition as sr
 import datetime
-import nltk
 import re
 
 class TimeInterval():
@@ -125,28 +124,6 @@ class GetTimeWorked():
             self.curr_interval.calculate_duration()
         elif not start_hour:
             self.curr_interval.calculate_start()
-
-    def parse_transcription_new(self, transcription):
-        
-        end_flags = ['since', 'to']
-        
-        #clean text
-        clean_transcription = transcription.lower() #casefold
-        tokens = clean_transcription.split()
-        tokens_tags = nltk.tag.pos_tag(tokens)
-        for i in range(len(tokens_tags)):
-            
-        #get POS tags
-        # if no CD:
-            #didn't understand
-        # else:
-            # split on and: "I worked 11 to 2 and 9 to 5"
-            # split on time
-                # sentence = clean_transcription
-                #for <CD> in sentence:
-                    # prev, sentence = sentence.split(<CD>)
-                
-
 
 def process_file(filepath):
     t = GetTimeWorked()
