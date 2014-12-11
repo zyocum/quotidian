@@ -70,42 +70,40 @@ def push_time():
     date = request.form['date'].split(',')[0]
     transcription, interval = process_text(transcription)
     
-    test_database[date] = interval
+    test_database[date] = test_database.get(date, []).append(interval)
 
+    intervals = ','.join(test_database[date])
     app.logger.info(test_database)
-    return jsonify(interval=interval)
+    return jsonify(intervals=intervals)
 	
 @app.route('/pull_time', methods = ['POST'])
 def pull_time():
     date = request.form['date'].split(',')[0]
 
-    interval = test_database.get(date, '')
+    intervals = ','.join(test_database.get(date, []))
 
     app.logger.info(test_database)
-    return jsonify(interval=interval)
+    return jsonify(intervals=intervals)
 
 @app.route('/clear_time', methods = ['POST'])
 def clear_time():
     date = request.form['date'].split(',')[0]
 
-    test_database[date] = ''
+    test_database[date] = []
+
+    app.logger.info(test_database)
+    return jsonify(intervals='')
+	
+@app.route('/calendar_click', methods = ['POST'])
+def calendar_click():
+    date = request.form['date'].split(',')[0]
+    intervals = request.intervals['transcription'].split(',')
+
+    test_database[date] = intervals
 
     app.logger.info(test_database)
     return jsonify(interval='')
-	
-@app.route('/test', methods = ['POST'])
-def test():
 
-    interval = request.form['transcription']
-    date = request.form['date'].split(',')[0]
-
-    app.logger.info(interval)
-
-    test_database[date] = interval
-
-    return jsonify(interval=interval)
-	
-	
 	
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
