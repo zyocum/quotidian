@@ -16,9 +16,13 @@ import datetime
 import re
 
 class TimeInterval():
-    def __init__(self):
+    def __init__(self, date=''):
         self.now = datetime.datetime.now()
-        self.start = datetime.datetime(self.now.year, self.now.month, self.now.day)
+        if date:
+            year, month, day = map(int, date.split("-"))
+            self.start = datetime.datetime(year, month, day)
+        else:
+            self.start = datetime.datetime(self.now.year, self.now.month, self.now.day)
         self.end = self.now.replace(microsecond=0, second=0)
         self.duration = datetime.timedelta()
 
@@ -52,10 +56,10 @@ class TimeInterval():
         return "%s/%s" %(start_string, end_string)
         
 class GetTimeWorked():
-    def __init__(self, transcription = ''):
-        self.curr_interval = TimeInterval()
+    def __init__(self, transcription = '', date=''):
         # for testing
         self.transcription = transcription.lower()
+        self.curr_interval = TimeInterval(date)        
         
     def speech_to_text(self, input_stream):
         r = sr.Recognizer()
@@ -90,7 +94,7 @@ class GetTimeWorked():
         end_hour, end_minute = self.find_start_end(["to", "till"])
         d_hours, d_minutes = self.find_duration()
 
-        # logic to load start and end times        
+        # logic to load start and end times
         if start_hour:
             start_hour = int(start_hour[0])
             if start_minute:
