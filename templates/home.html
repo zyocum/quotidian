@@ -33,15 +33,6 @@
                   type="hidden"
                   value="T8:0:0Z/T17:0:0Z"
               >
-              <input
-                  id="save_button"
-                  onClick="pushTime(); save();"
-                  class="btn btn-danger export save"
-                  download="timesheet.csv"
-                  href="#"
-                  target="_blank"
-                  value="Save"
-              >
               <p></p>
               <div id="myDiv"></div>
               <p></p>
@@ -75,9 +66,36 @@
 <center>
     <div id="calendar"></div>
 </center>
+
+<a href="#" class="export">Export Table data into Excel</a>
+
 {% endblock %}
 
 {% block scripts %}
+<script>
+
+$(document).ready(function () {
+    function exportTableToCSV(filename) {
+            // Data URI
+            csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent("bob,mary");
+        $(this)
+            .attr({
+            'download': filename,
+                'href': csvData,
+                'target': '_blank'
+        });
+    }
+
+    // This must be a hyperlink
+    $(".export").on('click', function (event) {
+        // CSV
+        exportTableToCSV.apply(this, ['export.csv']);
+        
+        // IF CSV, don't do event.preventDefault() or return false
+        // We actually need this to be a typical hyperlink
+    });
+});
+</script>
 <script src="{{ url_for('static', filename='js/record.js') }}"></script>
 <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
 {% endblock scripts %}
