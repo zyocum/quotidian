@@ -55,6 +55,9 @@ function DateTime() {
     this.toString = function() {
         return this.value.toLocaleString();
     };
+    this.toISOString = function() {
+        return this.value.toISOString();
+    }
     this.set = function(dt) {
         this.value.setTime(dt.getTime());
         return this;
@@ -379,8 +382,7 @@ getIntervals = function() {
 }
 
 // CALL THIS WHEN YOU SUBMIT TIME
-function pushTime()
-{
+function pushTime() {
     var req = new XMLHttpRequest()
     req.onreadystatechange = function()
     {
@@ -409,14 +411,13 @@ function pushTime()
     req.open('POST', '/push_time');
     req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     var transcription = document.getElementById('user_text').value;
-    var postVars = 'transcription='+transcription+'&date='+today.toString();
+    var postVars = 'transcription='+transcription+'&date='+today.toISOString();
     req.send(postVars);
     return false;
 }
 
 // CALL THIS WHEN YOU CHANGE DAY
-function pullTime()
-{
+function pullTime() {
     var req = new XMLHttpRequest()
     req.onreadystatechange = function()
     {
@@ -444,14 +445,13 @@ function pullTime()
     //post reqest - data sent to app.py
     req.open('POST', '/pull_time');
     req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    var postVars = 'date='+today.toString();
+    var postVars = 'date='+today.toISOString();
     req.send(postVars);
     return false;
 }
 
 // CALL THIS WHEN YOU CLEAR DAY
-function clearTime()
-{
+function clearTime() {
     var req = new XMLHttpRequest()
     req.onreadystatechange = function()
     {
@@ -472,7 +472,7 @@ function clearTime()
     //post reqest - data sent to app.py
     req.open('POST', '/clear_time');
     req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    var postVars = 'date='+today.toString();
+    var postVars = 'date='+today.toISOString();
     req.send(postVars);
     return false;
 }
@@ -496,7 +496,40 @@ function calendarClick() {
     //post reqest - data sent to app.py
     req.open('POST', '/calendar_click');
     req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    var postVars = 'intervals='+getIntervals()+'&date='+today.toString();
+    var postVars = 'intervals='+getIntervals()+'&date='+today.toISOString();
     req.send(postVars);
     return false;
+}
+
+function save() {
+    var req = new XMLHttpRequest()
+    req.onreadystatechange = function()
+    {
+        if (req.readyState == 4)
+        {
+            if (req.status != 200)
+            {
+                //error handling code here
+            }
+            else
+            {
+                //get request
+                var response = JSON.parse(req.responseText),
+                    csv = response.csv,
+                    csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(response.csv);
+                console.log(csv)
+                $(this).attr({
+                    'download' : 'timesheet.csv',
+                    'href' : csvData,
+                    'target' : '_blank'
+                });
+            }
+        }
+    }
+    req.open('POST', '/save');
+    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    var postVars = 'date='+today.toISOString();
+    req.send(postVars);
+    return false;
+    
 }

@@ -12,15 +12,15 @@ ISO for time encoding:
 http://en.wikipedia.org/wiki/ISO_8601
 '''
 import speech_recognition as sr
-import datetime
 import re
+from datetime import datetime, timedelta
 
 class TimeInterval():
     def __init__(self):
-        self.now = datetime.datetime.now()
-        self.start = datetime.datetime(self.now.year, self.now.month, self.now.day)
+        self.now = datetime.now()
+        self.start = datetime(self.now.year, self.now.month, self.now.day)
         self.end = self.now.replace(microsecond=0, second=0)
-        self.duration = datetime.timedelta()
+        self.duration = timedelta()
 
     def load_end(self, end_hour, end_minute = 0):        
         self.end = self.end.replace(hour = end_hour, minute = end_minute)
@@ -29,7 +29,7 @@ class TimeInterval():
         self.start = self.start.replace(hour = start_hour, minute = start_minute)
 
     def load_duration(self, duration_hours, duration_mins):
-        self.duration = datetime.timedelta(hours = duration_hours, 
+        self.duration = timedelta(hours = duration_hours, 
                                            minutes = duration_mins)
    
     def calculate_duration(self):
@@ -38,18 +38,18 @@ class TimeInterval():
     def calculate_start(self):
         self.start = self.end - self.duration
 
-    def datetime_to_iso(self, datetime_obj):
-        return "%d-%d-%dT%d:%d:%dZ" %(datetime_obj.year, 
-                                      datetime_obj.month, 
-                                      datetime_obj.day,
-                                      datetime_obj.hour,
-                                      datetime_obj.minute,
-                                      datetime_obj.second)
+    #def datetime_to_iso(self, datetime_obj):
+    #    return "%d-%d-%dT%d:%d:%dZ" %(datetime_obj.year, 
+    #                                  datetime_obj.month, 
+    #                                  datetime_obj.day,
+    #                                  datetime_obj.hour,
+    #                                  datetime_obj.minute,
+    #                                  datetime_obj.second)
     
     def interval_to_iso(self):
-        start_string = self.datetime_to_iso(self.start)
-        end_string = self.datetime_to_iso(self.end)
-        return "%s/%s" %(start_string, end_string)
+        #start_string = self.datetime_to_iso(self.start)
+        #end_string = self.datetime_to_iso(self.end)
+        return "{}/{}".format(self.start.isoformat(), self.end.isoformat())
         
 class GetTimeWorked():
     def __init__(self, transcription = ''):
