@@ -44,12 +44,12 @@ time_terms =  set(list(spelling_to_int.keys()) + [str(num) for num in spelling_t
 
 class TimeInterval():
     def __init__(self, date=''):
-        self.now = datetime.datetime.now()
+        self.now = datetime.now()
         if date:
             year, month, day = map(int, date.split("-"))
-            self.start = datetime.datetime(year, month, day)
+            self.start = datetime(year, month, day)
         else:
-            self.start = datetime.datetime(self.now.year, self.now.month, self.now.day)
+            self.start = datetime(self.now.year, self.now.month, self.now.day)
         self.end = self.now.replace(microsecond=0, second=0)
         self.duration = timedelta()
 
