@@ -143,25 +143,3 @@ def process_text(transcription):
         return t.transcription, error
     else:
         return t.transcription, t.curr_interval.interval_to_iso()
-
-if __name__ == "__main__":
-    
-    # DEMO
-    transcription = "I worked from 7 am to 8 pm" #"I've been working since 6 a.m."
- 
-#     t = GetTimeWorked(transcription)
-#     t.parse_transcription()
-#     print t.curr_interval.duration
-#     print t.curr_interval.start
-#     print t.curr_interval.end
-#     print t.curr_interval.interval_to_iso()
-    
-    t = GetTimeWorked(transcription)
-    print t.parse_transcription_new(transcription)
-    
-    #start: IN CD (N)
-    #end: IN/TO CD (N)
-    
-    
-#     print process_file("./test_5.wav")
-    
