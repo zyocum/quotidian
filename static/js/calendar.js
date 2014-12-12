@@ -323,11 +323,11 @@ fillHours = function() {
 }
 
 startHour = function(interval) {
-    return parseInt(interval.split('/')[0].split('T')[1].split(':')[0])-1;
+    return parseInt(interval.split('-')[0].split('T')[1].split(':')[0])-1;
 }
 
 endHour = function(interval) {
-    return parseInt(interval.split('/')[1].split('T')[1].split(':')[0])-1;
+    return parseInt(interval.split('-')[1].split('T')[1].split(':')[0])-1;
 }
 
 // Set all hours as not worked
