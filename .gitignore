@@ -12,3 +12,4 @@ venv
 
 media/audio/*
 !media/audio/iknow.mp3
+scratch.py

@@ -15,6 +15,33 @@ import speech_recognition as sr
 import datetime
 import re
 
+spelling_to_int =  {'one': 1,
+                    'two': 2,
+                    'three': 3,
+                    'four': 4,
+                    'five': 5,
+                    'six': 6,
+                    'seven': 7,
+                    'eight': 8,
+                    'nine': 9,
+                    'ten': 10,
+                    'eleven': 11,
+                    'twelve': 12,
+                    'thirteen': 13,
+                    'fourteen': 14,
+                    'fifteen': 15,
+                    'sixteen': 16,
+                    'seventeen': 17,
+                    'eighteen': 18,
+                    'nineteen': 19,
+                    'twenty': 20,
+                    'thirty': 30,
+                    'forty': 40,
+                    'fifty': 50}
+
+time_terms =  set(list(spelling_to_int.keys()) + [str(num) for num in spelling_to_int.values()])
+
+
 class TimeInterval():
     def __init__(self, date=''):
         self.now = datetime.datetime.now()
@@ -89,61 +116,76 @@ class GetTimeWorked():
         return d_hours, d_minutes
 
     def parse_transcription(self):
-        # parse transcription to get start and end times
-        start_hour, start_minute = self.find_start_end(["from", "since"])
-        end_hour, end_minute = self.find_start_end(["to", "till"])
-        d_hours, d_minutes = self.find_duration()
-
-        # logic to load start and end times
-        if start_hour:
-            start_hour = int(start_hour[0])
-            if start_minute:
-                start_minute = int(start_minute[0])
-                self.curr_interval.load_start(start_hour, start_minute)
-            else:
-                self.curr_interval.load_start(start_hour)
-        if end_hour:
-            end_hour = int(end_hour[0])
-            # set am / pm for end time based on current time
-            if start_hour > end_hour:
-            #if self.curr_interval.now.hour > 12:
-                end_hour = end_hour + 12
-            if end_minute:
-                end_minute = int(end_minute[0])
-                self.curr_interval.load_end(end_hour, end_minute)
-            else:
-                self.curr_interval.load_end(end_hour)
-        if d_hours and d_minutes:
-            self.curr_interval.load_duration(int(d_hours[0]), int(d_minutes[0]))
-        elif d_hours:
-            self.curr_interval.load_duration(int(d_hours[0]), 0)             
-        elif d_minutes:
-            self.curr_interval.load_duration(0, int(d_minutes[0]))
-            
-        # calculate missing elements
-        if not start_hour and not d_hours and not d_minutes:
-            # if we need more information
+        tokens = self.transcription.split()
+        print tokens
+        time_count = len([tok for tok in tokens if tok in time_terms])
+        
+        # no times provided 
+        if time_count == 0:
             return "Error: need start time or duration worked"
-        elif not d_hours and not d_minutes:
-            self.curr_interval.calculate_duration()
-        elif not start_hour:
+        
+        # duration provided
+        if 'for' in tokens:
+            d_hours = re.findall("(\d+) hour", self.transcription)
+            d_minutes = re.findall("(\d+) minute", self.transcription)
+            if d_hours and d_minutes:
+                self.curr_interval.load_duration(int(d_hours[0]), int(d_minutes[0]))
+            elif d_hours:
+                self.curr_interval.load_duration(int(d_hours[0]), 0)
+            elif d_minutes:
+                self.curr_interval.load_duration(0, int(d_minutes[0]))
             self.curr_interval.calculate_start()
+            return self.curr_interval.interval_to_iso()
+        # start / end provided
+        intervals = []
+        if time_count == 1:
+            for i in range(len(tokens)):            
+                tok = tokens[i]
+                if tok in time_terms:
+                    if tok in spelling_to_int:
+                        hour = spelling_to_int[tok]
+                    else:
+                        hour = int(tok)
+                    self.curr_interval.load_start(hour)
+                    return self.curr_interval.interval_to_iso()
+        if time_count % 2 == 0:
+            is_start = True
+            last = 0
+            for i in range(len(tokens)):            
+                tok = tokens[i]
+                if tok in time_terms:
+                    if tok in spelling_to_int:
+                        hour = spelling_to_int[tok]
+                    else:
+                        hour = int(tok)
+                    if last >= hour:
+                        hour += 12
+                    else:
+                        for tok in tokens[i+1:i+2]:
+                            if tok == 'pm' and hour <= 12:
+                                hour += 12
+                                break
+                    if is_start:
+                        self.curr_interval.load_start(hour)
+                        is_start = False
+                    else:
+                        self.curr_interval.load_end(hour)                    
+                        intervals.append(self.curr_interval.interval_to_iso())
+                        is_start = True
+                    last = hour
+            return ','.join(intervals)
+
 
 def process_file(filepath):
     t = GetTimeWorked()
     audio =  sr.WavFile(filepath)
     t.speech_to_text(audio)
-    error = t.parse_transcription()
-    if error:
-        return t.transcription, error
-    else:
-        return t.transcription, t.curr_interval.interval_to_iso()
+    intervals = t.parse_transcription()
+    return t.transcription, intervals
 
-def process_text(transcription):
-    t = GetTimeWorked()
+def process_text(transcription, date):
+    t = GetTimeWorked(date)
     t.transcription = transcription
-    error = t.parse_transcription()
-    if error:
-        return t.transcription, error
-    else:
-        return t.transcription, t.curr_interval.interval_to_iso()
+    intervals = t.parse_transcription()
+    return t.transcription, intervals
+

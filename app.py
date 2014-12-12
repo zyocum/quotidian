@@ -68,13 +68,14 @@ test_database = {}
 def push_time():
     transcription = request.form['transcription']
     date = request.form['date'].split(',')[0]
-    transcription, interval = process_text(transcription)
+    transcription, interval = process_text(transcription, date)
     
-    temp = test_database.get(date, '')
-    if temp == '':
-	    test_database[date] = interval
-    else:
-	    test_database[date] =  temp + ',' + interval
+    if not interval.startswith('Error'):
+        temp = test_database.get(date, '')
+        if temp == '':
+    	    test_database[date] = interval
+        else:
+    	    test_database[date] =  temp + ',' + interval
 	
     intervals = test_database[date]
     app.logger.info(intervals)
