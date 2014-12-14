@@ -67,52 +67,93 @@ class Week(object):
     
     def get_days(self):
         return map(date.isoformat, self.dates)
+    
+    def intervals(self):
+        return [test_database.get(day, '') for day in self.get_days()]
+    
+    def dt_intervals(self):
+        intervals = []
+        for interval in self.intervals():
+            if any(interval):
+                intervals.append([map(get_datetime, iv.split('/')) for iv in interval.split(',')])
+            else:
+                intervals.append([])
+        return intervals
+    
+    def hr_intervals(self, time_format='%I:%M %p'):
+        intervals = []
+        for interval in self.dt_intervals():
+            output = []
+            if any(interval):
+                for start, end in interval:
+                    output.append(
+                        ' to '.join([
+                            start.strftime(time_format),
+                            end.strftime(time_format)
+                        ])
+                    )
+            intervals.append(','.join(output))
+        return intervals
+    
+    def hr_dates(self, date_format='%m/%d/%Y'):
+        return [dt.strftime(date_format) for dt in self.get_dates()]
+    
+    def hour_durations(self):
+        intervals = []
+        for interval in self.dt_intervals():
+            if any(interval):
+                intervals.append([
+                    end.hour - start.hour for start, end in interval
+                ])
+            else:
+                intervals.append([])
+        return intervals
+    
+    def hour_totals(self):
+        return map(sum, self.hour_durations())
 
-#def iso_string_to_datetime(iso_date_string):
-#    """Return a datetime object for the given an ISO formatted date string."""
-#    print "iso_date_string:", iso_date_string
-#    if iso_date_string:
-#        date, time = iso_date_string.split('T')
-#        year, month, day = date.split('-')
-#        hour, minute, second = time.split(':')
-#        return datetime(year, month, day, hour, minute, second)
-#    else:
-#        return ''
+    def total_hours(self):
+        return sum(self.hour_totals())
+
+def get_datetime(iso_date_string):
+    """Return a datetime object for the given an ISO formatted date string."""
+    print "iso_date_string:", iso_date_string
+    if iso_date_string:
+        app.logger.info(iso_date_string)
+        date, time = iso_date_string.split('T')
+        year, month, day = date.split('-')
+        hour, minute, second = time.split(':')
+        if '.' in second:
+            second, _ = second.split('.')
+        args = map(int, (year, month, day, hour, minute, second))
+        return datetime(*args)
+    else:
+        return ''
 
 def csv(week):
     """Take a week's worth of intervals and return a timesheet as CSV."""
-    intervals_list = [test_database.get(week.days[i], '') for i in range(len(week))]
-    csv = ',Date,,'
-    csv += '\n'.join([
-        'Monday,{date},{intervals},'.format(
-            date=week.days[0],
-            intervals=intervals_list[0]
-        ),
-        'Tuesday,{date},{intervals},'.format(
-            date=week.days[1],
-            intervals=intervals_list[1]
-        ),
-        'Wednesday,{date},{intervals},'.format(
-            date=week.days[2],
-            intervals=intervals_list[2]
-        ),
-        'Thursday,{date},{intervals},'.format(
-            date=week.days[3],
-            intervals=intervals_list[3]
-        ),
-        'Friday,{date},{intervals},'.format(
-            date=week.days[4],
-            intervals=intervals_list[4]
-        ),
-        'Saturday,{date},{intervals},'.format(
-            date=week.days[5],
-            intervals=intervals_list[5]
-        ),
-        'Sunday,{date},{intervals},'.format(
-            date=week.days[6],
-            intervals=intervals_list[6]
+    days = (
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+    )
+    dates = week.hr_dates()
+    intervals = week.hr_intervals()
+    hours = week.hour_totals()
+    total = week.total_hours()
+    csv = ',Date,Daily Total Hours,\n'
+    for i in range(7):
+        csv += '{day},{date},{total},{intervals}\n'.format(
+            day=days[i],
+            date=dates[i],
+            intervals=intervals[i],
+            total=hours[i]
         )
-    ])
+    csv += '\n,Total Weekly Hours,{total}'.format(total=total)
     return csv
 
 @app.route('/', methods=['GET', 'POST'])
@@ -201,30 +242,12 @@ def calendar_click():
 
 @app.route('/save', methods = ['POST'])
 def save():
-    """This route will prompt a file download for the csv"""
+    """This route will return a response with the csv data."""
     dt = request.form['date'].split('T')[0]
     year, month, day = map(int, dt.split('-'))
     date_time = datetime(year, month, day)
-    # We need to modify the response, so the first thing we 
-    # need to do is create a response out of the CSV string
     timesheet = csv(Week(date_time))
-    #app.logger.info('CSV : {}'.format(timesheet))
-    #filename = secure_filename('timesheet.csv')
-    #temp_directory = tempfile.mkdtemp(dir=app.config['UPLOAD_FOLDER'])
-    #temp_folder = os.path.split(temp_directory)[1]
-    #full_path = os.path.join(temp_directory, filename)
-    #with open(full_path, 'wb') as file:
-    #    file.write(timesheet)
-    # delete the csv file
-    #for root, dirs, files in os.walk(os.path.split(temp_directory)[0], topdown=False):
-    #    for name in files:
-    #        os.remove(os.path.join(root, name))
-    #    for name in dirs:
-    #        os.rmdir(os.path.join(root, name))
-    #return send_from_directory(temp_folder, filename, as_attachment=True)
-    # This is the key: Set the right header for the response
-    # to be downloaded, instead of just printed on the browser
-    #response.headers["Content-Disposition"] = "attachment; filename=timesheet.csv"
+    app.logger.info('CSV : {}'.format(timesheet))
     return jsonify(csv=timesheet)
     
 if __name__ == '__main__':

@@ -313,7 +313,7 @@ unsetHours = function(start, end) {
 
 // Set hours in the interval (specified in the HTML form hidden value) as worked
 fillHours = function() {
-    var intervals = document.querySelector('input[type="hidden"]').value;
+    var intervals = document.getElementById('interval').value;
     for (var i = 0; i < intervals.length; i++) {
         var interval = intervals[i],
             start = startHour(interval),
@@ -323,11 +323,19 @@ fillHours = function() {
 }
 
 startHour = function(interval) {
-    return parseInt(interval.split('/')[0].split('T')[1].split(':')[0])-1;
+    if (typeof(interval) != 'undefined') {
+        return parseInt(interval.split('/')[0].split('T')[1].split(':')[0])-1;
+    }
+    return null
 }
 
 endHour = function(interval) {
-    return parseInt(interval.split('/')[1].split('T')[1].split(':')[0])-1;
+    if (typeof(interval) != 'undefined') {
+        return parseInt(interval.split('/')[1].split('T')[1].split(':')[0])-1;
+    }
+    else {
+        return null
+    }
 }
 
 // Set all hours as not worked
@@ -479,20 +487,6 @@ function clearTime() {
 
 function calendarClick() {
     var req = new XMLHttpRequest()
-    //req.onreadystatechange = function()
-    //{
-    //    if (req.readyState == 4)
-    //    {
-    //        if (req.status != 200)
-    //        {
-    //            //error handling code here
-    //        }
-    //        else
-    //        {
-    //            //post request
-    //        }
-    //    }
-    //}
     //post reqest - data sent to app.py
     req.open('POST', '/calendar_click');
     req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -502,7 +496,7 @@ function calendarClick() {
 }
 
 function save() {
-    var req = new XMLHttpRequest()
+    var req = new XMLHttpRequest();
     req.onreadystatechange = function()
     {
         if (req.readyState == 4)
@@ -514,15 +508,9 @@ function save() {
             else
             {
                 //get request
-                var response = JSON.parse(req.responseText),
-                    csv = response.csv,
-                    csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(response.csv);
-                console.log(csv)
-                $(this).attr({
-                    'download' : 'timesheet.csv',
-                    'href' : csvData,
-                    'target' : '_blank'
-                });
+                var response = JSON.parse(req.responseText);
+                csv = response.csv;
+                return false;
             }
         }
     }
@@ -531,5 +519,27 @@ function save() {
     var postVars = 'date='+today.toISOString();
     req.send(postVars);
     return false;
-    
 }
+
+$(document).ready(function () {
+    function exportTableToCSV(filename) {
+        save();
+        // Data URI
+        var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+        $(this)
+            .attr({
+            'download': 'timesheet.csv',
+                'href': csvData,
+                'target': '_blank'
+        });
+    }
+
+    // This must be a hyperlink
+    $(".export").on('click', function (event) {
+        // CSV
+        exportTableToCSV.apply(this, ['timesheet.csv']);
+        
+        // IF CSV, don't do event.preventDefault() or return false
+        // We actually need this to be a typical hyperlink
+    });
+});

@@ -78,6 +78,13 @@ footer .footer-nav {
   margin-right: 25px;
 }
 
+/* download link */
+
+.export {
+    color: White;
+    text-decoration: underline;
+}
+
 /* table */
 
 table {
