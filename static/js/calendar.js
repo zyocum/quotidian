@@ -381,6 +381,8 @@ getIntervals = function() {
             interval = [];
         d1.setHours(hours.indexOf(starts[i]));
         d2.setHours(hours.indexOf(ends[i])+1);
+        d1.setHours(d1.getHours() - ((d1.getTimezoneOffset() / 100)+1));
+        d2.setHours(d2.getHours() - ((d2.getTimezoneOffset() / 100)+1));
         interval.push(d1.toISOString());
         interval.push(d2.toISOString());
         console.log('Interval ' + i + ' : ' + interval.join('/'));
