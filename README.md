@@ -93,7 +93,7 @@
 	
 6. Clearing hours
 
-	a. if there
+	a. hit the clear hours button to remove any worked hours from the current day.
 
 	
 # c) CREDENTIALS
